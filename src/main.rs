@@ -2,25 +2,27 @@
 extern crate time;
 
 use std::io;
+use std::marker::PhantomData;
+
 use time::PreciseTime;
 
-// fn main() {
-//     for digit_count in Tests::new().skip(1) {
-//         match generate_key(digit_count) {
-//             Key::None => println!("-1"),
-//             Key::DecentNumber(k) => println!("{}", k),
-//         }
-//     }
-// }
-
 fn main() {
-    let start = PreciseTime::now();
-    for digit_count in 1..100000 {
-        generate_key(digit_count);
+    for digit_count in Tests::new().skip(1) {
+        match generate_key(digit_count) {
+            Key::None => println!("-1"),
+            Key::DecentNumber(k) => println!("{}", k),
+        }
     }
-    let end = PreciseTime::now();
-    println!("{} seconds", start.to(end));
 }
+
+// fn main() {
+//     let start = PreciseTime::now();
+//     for digit_count in 1..100000 {
+//         generate_key(digit_count);
+//     }
+//     let end = PreciseTime::now();
+//     println!("{} seconds", start.to(end));
+// }
 
 
 pub fn generate_key(digits: u32) -> Key {
@@ -79,26 +81,28 @@ pub fn repeat(num: Number, count: usize) -> String {
 }
 
 
-struct Tests {
+struct Tests<T> {
     complete: bool,
+    resource_type: PhantomData<T>,
 }
 
-impl Tests {
-    fn new() -> Tests {
+impl<T> Tests<T> {
+    fn new() -> Tests<T> {
         Tests {
             complete: false,
+            resource_type: PhantomData,
         }
     }
 }
 
-impl Iterator for Tests {
-    type Item = u32;
-    fn next(&mut self) -> Option<u32> {
+impl<T> Iterator for Tests<T> where T: std::str::FromStr, <T as std::str::FromStr>::Err : std::fmt::Debug {
+    type Item = T;
+    fn next(&mut self) -> Option<T> {
         if !self.complete {
             let mut input = String::new();
             match io::stdin().read_line(&mut input) {
                 Ok(len) => if len > 0 { 
-                        return Option::Some(input.trim().parse::<u32>().unwrap());
+                        return Option::Some(input.trim().parse::<T>().unwrap());
                   } else {
                         self.complete = true;
                         return Option::None;
