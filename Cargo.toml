@@ -1,0 +1,7 @@
+[package]
+name = "sherlock_and_the_beast"
+version = "0.1.0"
+authors = ["Rhys Williams <Rhys.Williams@rightcrowd.com>"]
+
+[dependencies]
+time = "*"
