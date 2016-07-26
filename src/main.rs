@@ -41,17 +41,31 @@ pub fn generate_key(digits: u32) -> Key {
 }
 
 pub fn find_decent_number(digits: u32) -> DecentNumber {
-    if digits == 3 {
+    if digits.decent_fives() {
         DecentNumber::Number{fives: digits, threes: 0}
-    }
+    } else if digits < 3 {
+        DecentNumber::None
+    } else {
+        let mut fives = digits;
+        let mut threes = 0;
 
-    let mut fives = digits;
-    let mut threes = 0;
+        while fives % 3 != 0 {
+            fives -= 1;
+            threes += 1;
+            if fives.decent_fives() && threes.decent_threes() {
+                return DecentNumber::Number { fives: fives, threes: threes };
+            }
+        }    
 
-    
-    
-    while fives != 0 {
+        while fives != 0 {
+            fives -= 3;
+            threes += 3;
+            if fives.decent_fives() && threes.decent_threes() {
+                return DecentNumber::Number { fives: fives, threes: threes };
+            }
+        }
 
+        DecentNumber::None
     }
 }
 
